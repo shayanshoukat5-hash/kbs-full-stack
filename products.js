@@ -66,7 +66,7 @@ const PRODUCTS = [
      img: 'jugs.jpeg' },
    { id: 'p27', name: 'Glass', price:649 ,
      desc: ' High-quality water drnking glasses(1pcs)',
-     img: 'Style glass.jpeg' },
+     img: 'styleglass.jpeg' },
    { id: 'p28', name: 'Dinner set(72 pcs)', price: 12499,
      desc: ' High-quality water drnking glasses',
      img: 'dinner1set.jpeg' },
