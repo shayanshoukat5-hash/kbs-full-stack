@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Your Cart — KBS</title>
+<link rel="icon" type="image/jpeg" href="logo.jpeg">
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+ <style>
+   :root {
+     --kbs-cream:   #faf6f0;
+     --kbs-sand:    #f1ebe1;
+     --kbs-beige:   #ede4d3;
+     --kbs-dark:    #2c2a27;
+     --kbs-accent:  #b7895a;
+   }
+
+   body {
+     font-family: 'Segoe UI', Tahoma, sans-serif;
+     background-color: var(--kbs-cream);
+     color: var(--kbs-dark);
+   }
+
+   .navbar-brand { font-weight: 700; letter-spacing: 1px; }
+   .navbar-custom { background-color: var(--kbs-dark) !important; }
+
+   .cart-section { padding: 50px 0 80px; }
+
+   .cart-item {
+     background-color: #fffdf9;
+     border: 1px solid var(--kbs-beige);
+     border-radius: 10px;
+     padding: 15px;
+     margin-bottom: 15px;
+     transition: box-shadow 0.2s ease;
+   }
+   .cart-item:hover {
+     box-shadow: 0 6px 18px rgba(120, 90, 50, 0.10);
+   }
+   .cart-item img {
+     width: 100%;
+     height: 110px;
+     object-fit: cover;
+     border-radius: 6px;
+   }
+   .item-name { font-weight: 600; margin-bottom: 4px; }
+   .item-desc { color: #8a8175; font-size: 0.875rem; margin-bottom: 0; }
+   .item-price { color: #8a5a2b; font-weight: 600; }
+
+   /* Quantity controls */
+   .qty-controls {
+     display: inline-flex;
+     align-items: center;
+     border: 1px solid var(--kbs-beige);
+     border-radius: 6px;
+     overflow: hidden;
+     background: #fff;
+   }
+   .qty-controls button {
+     border: none;
+     background: transparent;
+     width: 34px;
+     height: 34px;
+     font-size: 1rem;
+     color: var(--kbs-dark);
+     cursor: pointer;
+   }
+   .qty-controls button:hover { background-color: var(--kbs-sand); }
+   .qty-controls .qty-value {
+     min-width: 36px;
+     text-align: center;
+     font-weight: 600;
+   }
+
+   .btn-remove {
+     color: #b04646;
+     background: transparent;
+     border: none;
+     font-size: 1.1rem;
+   }
+   .btn-remove:hover { color: #7a2828; }
+
+   /* Summary */
+   .summary-card {
+     background-color: var(--kbs-sand);
+     border: 1px solid var(--kbs-beige);
+     border-radius: 10px;
+     padding: 25px;
+     position: sticky;
+     top: 90px;
+   }
+   .summary-row {
+     display: flex;
+     justify-content: space-between;
+     margin-bottom: 10px;
+   }
+   .summary-total {
+     border-top: 1px solid var(--kbs-beige);
+     padding-top: 12px;
+     margin-top: 12px;
+     font-size: 1.2rem;
+     font-weight: 700;
+     color: var(--kbs-dark);
+   }
+
+   .btn-kbs {
+     background-color: var(--kbs-accent);
+     color: #fff;
+     border: none;
+   }
+   .btn-kbs:hover { background-color: #9c7249; color: #fff; }
+
+   /* Empty state */
+   .empty-cart {
+     text-align: center;
+     padding: 60px 20px;
+     color: #7a6f5f;
+   }
+   .empty-cart i {
+     font-size: 4rem;
+     color: var(--kbs-beige);
+     margin-bottom: 20px;
+   }
+
+   footer {
+     background: var(--kbs-dark);
+     color: #d4c9b5;
+     padding: 25px 0;
+     margin-top: 60px;
+   }
+ </style>
+</head>
+<body>
+
+ <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+   <div class="container">
+     <a class="navbar-brand" href="index.html">
+       <i class="bi bi-cup-hot-fill"></i> KBS
+     </a>
+     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+             data-bs-target="#mainNav" aria-controls="mainNav"
+             aria-expanded="false" aria-label="Toggle navigation">
+       <span class="navbar-toggler-icon"></span>
+     </button>
+     <div class="collapse navbar-collapse" id="mainNav">
+       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+         <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+         <li class="nav-item"><a class="nav-link" href="index.html#products">Shop</a></li>
+         <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
+         <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+         <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+       </ul>
+       <a href="cart.html" class="btn btn-warning position-relative text-decoration-none">
+         <i class="bi bi-cart-fill"></i> Cart
+         <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+           0
+         </span>
+       </a>
+     </div>
+   </div>
+ </nav>
+
+ <section class="cart-section">
+   <div class="container">
+     <h2 class="mb-4">Shopping Cart</h2>
+
+     <div class="row g-4">
+       <div class="col-lg-8" id="cartItemsCol">
+         </div>
+
+       <div class="col-lg-4" id="summaryCol">
+         </div>
+     </div>
+   </div>
+ </section>
+
+ <footer class="text-center">
+   <div class="container">
+     <p class="mb-1">&copy; 2026 KBS — Khokhar Bartan Store. All rights reserved.</p>
+     <small>Built with Bootstrap 5</small>
+   </div>
+ </footer>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ 
+ <script src="products.js"></script>
+
+ <script>
+   // ====== CART HELPERS ======
+   const CART_KEY = 'kbs_cart';
+
+   function getCart() {
+     try {
+       return JSON.parse(localStorage.getItem(CART_KEY)) || {};
+     } catch (e) {
+       return {};
+     }
+   }
+
+   function saveCart(cart) {
+     localStorage.setItem(CART_KEY, JSON.stringify(cart));
+     updateBadge();
+   }
+
+   function updateBadge() {
+     const cart = getCart();
+     const total = Object.values(cart).reduce((a, b) => a + b, 0);
+     const badge = document.getElementById('cartBadge');
+     if (badge) badge.textContent = total;
+   }
+
+   function changeQty(productId, delta) {
+     const cart = getCart();
+     const newQty = (cart[productId] || 0) + delta;
+     if (newQty <= 0) {
+       delete cart[productId];
+     } else {
+       cart[productId] = newQty;
+     }
+     saveCart(cart);
+     render();
+   }
+
+   function removeItem(productId) {
+     const cart = getCart();
+     delete cart[productId];
+     saveCart(cart);
+     render();
+   }
+
+   function checkout() {
+     const cart = getCart();
+     const itemIds = Object.keys(cart);
+     
+     if (itemIds.length === 0) {
+       alert("Your cart is empty!");
+       return;
+     }
+     
+     // Redirect to the actual checkout page instead of just alerting
+     window.location.href = 'checkout.html';
+   }
+
+   function computeSummary(cart) {
+     let subtotal = 0;
+     let itemCount = 0;
+     for (const id in cart) {
+       // PRODUCTS is now pulled from products.js automatically!
+       const p = PRODUCTS.find(x => x.id === id);
+       if (p) {
+         subtotal += p.price * cart[id];
+         itemCount += cart[id];
+       }
+     }
+     // Flat shipping rule: free over PKR2000, else PKR49
+     const shipping = subtotal === 0 ? 0 : (subtotal >= 2000 ? 0 : 49);
+     return { subtotal, shipping, total: subtotal + shipping, itemCount };
+   }
+
+   // ====== RENDER ======
+   function render() {
+     const cart = getCart();
+     const itemIds = Object.keys(cart);
+     const itemsCol = document.getElementById('cartItemsCol');
+     const summaryCol = document.getElementById('summaryCol');
+
+     // Empty cart
+     if (itemIds.length === 0) {
+       itemsCol.innerHTML = `
+         <div class="empty-cart">
+           <i class="bi bi-cart-x"></i>
+           <h4>Your cart is empty</h4>
+           <p>Looks like you haven't added anything yet.</p>
+           <a href="index.html" class="btn btn-kbs mt-2">
+             <i class="bi bi-arrow-left"></i> Continue Shopping
+           </a>
+         </div>
+       `;
+       summaryCol.innerHTML = '';
+       return;
+     }
+
+     // Items
+     itemsCol.innerHTML = itemIds.map(id => {
+       const p = PRODUCTS.find(x => x.id === id);
+       if (!p) return ''; // unknown product id, skip
+       const qty = cart[id];
+       const lineTotal = p.price * qty;
+       return `
+         <div class="cart-item">
+           <div class="row g-3 align-items-center">
+             <div class="col-3 col-md-2">
+               <img src="${p.img}" alt="${p.name}">
+             </div>
+             <div class="col-9 col-md-5">
+               <p class="item-name">${p.name}</p>
+               <p class="item-desc d-none d-md-block">${p.desc || ''}</p>
+               <p class="item-price d-md-none mb-0">PKR ${p.price.toLocaleString('en-IN')}</p>
+             </div>
+             <div class="col-12 col-md-3 text-md-center">
+               <div class="qty-controls">
+                 <button onclick="changeQty('${p.id}', -1)" title="Decrease">−</button>
+                 <span class="qty-value">${qty}</span>
+                 <button onclick="changeQty('${p.id}', 1)" title="Increase">+</button>
+               </div>
+             </div>
+             <div class="col-12 col-md-2 text-md-end">
+               <div class="d-flex align-items-center justify-content-md-end gap-2">
+                 <span class="item-price d-none d-md-inline">
+                   PKR ${lineTotal.toLocaleString('en-IN')}
+                 </span>
+                 <button class="btn-remove" onclick="removeItem('${p.id}')" title="Remove">
+                   <i class="bi bi-trash"></i>
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+       `;
+     }).join('');
+
+     // Summary
+     const s = computeSummary(cart);
+     summaryCol.innerHTML = `
+       <div class="summary-card">
+         <h5 class="mb-4">Order Summary</h5>
+         <div class="summary-row">
+           <span>Items (${s.itemCount})</span>
+           <span>PKR ${s.subtotal.toLocaleString('en-IN')}</span>
+         </div>
+         <div class="summary-row">
+           <span>Shipping</span>
+           <span>${s.shipping === 0 ? 'FREE' : 'PKR ' + s.shipping}</span>
+         </div>
+         ${s.subtotal < 2000 ? `
+           <small class="text-muted d-block mb-2">
+             Add PKR ${(2000 - s.subtotal).toLocaleString('en-IN')} more for free shipping
+           </small>
+         ` : ''}
+         <div class="summary-row summary-total">
+           <span>Total</span>
+           <span>PKR ${s.total.toLocaleString('en-IN')}</span>
+         </div>
+         <button class="btn btn-kbs w-100 mt-3" onclick="checkout()">
+           <i class="bi bi-bag-check-fill me-1"></i> Proceed to Checkout
+         </button>
+       </div>
+     `;
+   }
+
+   // ====== INIT ======
+   render();
+   updateBadge();
+
+   // Live sync if cart changes in another tab
+   window.addEventListener('storage', (e) => {
+     if (e.key === CART_KEY) {
+       updateBadge();
+       render();
+     }
+   });
+ </script>
+
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KBS — Khokhar Bartan Store</title>
+<link rel="icon" type="image/jpeg" href="logo.jpeg">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<style>
+ :root {
+   --kbs-cream:   #faf6f0;
+   --kbs-sand:    #f1ebe1;
+   --kbs-beige:   #ede4d3;
+   --kbs-dark:    #2c2a27;
+   --kbs-accent:  #b7895a;
+ }
+
+
+ body {
+   font-family: 'Segoe UI', Tahoma, sans-serif;
+   background-color: var(--kbs-cream);
+   color: var(--kbs-dark);
+ }
+
+
+ .navbar-brand { font-weight: 700; letter-spacing: 1px; }
+ .navbar-custom { background-color: var(--kbs-dark) !important; }
+
+
+ .carousel-item img { height: 480px; object-fit: cover; }
+ .carousel-caption {
+   background: rgba(0, 0, 0, 0.45);
+   border-radius: 10px;
+   padding: 15px 25px;
+ }
+
+
+ .products-section {
+   background-color: var(--kbs-sand);
+   padding: 60px 0;
+   margin-top: 40px;
+   border-top: 1px solid var(--kbs-beige);
+   border-bottom: 1px solid var(--kbs-beige);
+ }
+ .section-title { color: var(--kbs-dark); }
+ .section-subtitle { color: #7a6f5f; }
+
+
+ .product-card {
+   transition: transform 0.2s ease, box-shadow 0.2s ease;
+   height: 100%;
+   background-color: #fffdf9;
+   border: 1px solid var(--kbs-beige);
+ }
+ .product-card:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 10px 25px rgba(120, 90, 50, 0.15);
+ }
+ .product-card img { height: 220px; object-fit: cover; }
+ .price { font-size: 1.25rem; font-weight: 600; color: #8a5a2b; }
+
+
+ .btn-kbs {
+   background-color: var(--kbs-accent);
+   color: #fff;
+   border: none;
+ }
+ .btn-kbs:hover { background-color: #9c7249; color: #fff; }
+
+
+ /* Highlight matched text in search results */
+ .search-highlight {
+   background-color: #ffe8a3;
+   padding: 0 2px;
+   border-radius: 2px;
+   font-weight: 600;
+ }
+
+
+ /* Search status banner */
+ .search-status {
+   background-color: #fffdf9;
+   border: 1px solid var(--kbs-beige);
+   border-radius: 6px;
+   padding: 10px 16px;
+   margin-bottom: 25px;
+   display: none;
+   align-items: center;
+   justify-content: space-between;
+ }
+ .search-status.active { display: flex; }
+ .btn-clear {
+   background: transparent;
+   border: 1px solid var(--kbs-accent);
+   color: var(--kbs-accent);
+   padding: 4px 12px;
+   border-radius: 4px;
+   font-size: 0.875rem;
+ }
+ .btn-clear:hover { background: var(--kbs-accent); color: #fff; }
+
+
+ .no-results {
+   text-align: center;
+   padding: 50px 20px;
+   color: #7a6f5f;
+ }
+ .no-results i { font-size: 3rem; color: var(--kbs-beige); margin-bottom: 15px; }
+
+
+ /* small toast for "added to cart" feedback */
+ .kbs-toast {
+   position: fixed;
+   bottom: 30px;
+   right: 30px;
+   background: var(--kbs-dark);
+   color: #fff;
+   padding: 12px 20px;
+   border-radius: 6px;
+   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+   opacity: 0;
+   transform: translateY(20px);
+   transition: opacity 0.3s, transform 0.3s;
+   z-index: 9999;
+ }
+ .kbs-toast.show { opacity: 1; transform: translateY(0); }
+
+
+ footer {
+   background: var(--kbs-dark);
+   color: #d4c9b5;
+   padding: 25px 0;
+ }
+</style>
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+ <div class="container">
+   <a class="navbar-brand" href="index.html">
+     <i class="bi bi-cup-hot-fill"></i> KBS
+   </a>
+   <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+           data-bs-target="#mainNav" aria-controls="mainNav"
+           aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+   <div class="collapse navbar-collapse" id="mainNav">
+     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+       <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+       <li class="nav-item"><a class="nav-link" href="#products">Shop</a></li>
+       <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
+       <li class="nav-item"><a class="nav-link" href="aboutus.html">About</a></li>
+       <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+     </ul>
+     <form class="d-flex me-3" role="search" onsubmit="return handleSearchSubmit(event);">
+       <input id="searchInput" class="form-control me-2" type="search"
+              placeholder="Search products" autocomplete="off"
+              oninput="handleSearchInput()">
+       <button class="btn btn-outline-light" type="submit">
+         <i class="bi bi-search"></i>
+       </button>
+     </form>
+     <a href="cart.html" class="btn btn-warning position-relative text-decoration-none">
+       <i class="bi bi-cart-fill"></i> Cart
+       <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+         0
+       </span>
+     </a>
+   </div>
+ </div>
+</nav>
+
+
+<div id="kbsCarousel" class="carousel slide" data-bs-ride="carousel">
+ <div class="carousel-indicators">
+   <button type="button" data-bs-target="#kbsCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+   <button type="button" data-bs-target="#kbsCarousel" data-bs-slide-to="1"></button>
+   <button type="button" data-bs-target="#kbsCarousel" data-bs-slide-to="2"></button>
+ </div>
+ 
+ <div class="carousel-inner">
+   <div class="carousel-item active">
+     <img src="shop.jpeg" class="d-block w-100" alt="Premium Dinnerware">
+     <div class="carousel-caption d-none d-md-block">
+    
+       <h2>Premium Dinnerware</h2>
+       <p>Turning Dine into an art form.</p>
+     </div>
+   </div>
+   <div class="carousel-item">
+     <img src="shop2.jpeg" class="d-block w-100" alt="Cutlery Collection">
+     <div class="carousel-caption d-none d-md-block">
+       <h2>Cutlery Collection</h2>
+       <p>Sleek, durable, and beautifully finished.</p>
+     </div>
+   </div>
+   <div class="carousel-item">
+     <img src="shop1.jpeg" class="d-block w-100" alt="Glassware & Mugs">
+     <div class="carousel-caption d-none d-md-block">
+       <h2>Glassware &amp; Mugs</h2>
+       <p>Style up your table with our finest designs.</p>
+     </div>
+   </div>
+ </div>
+ <button class="carousel-control-prev" type="button" data-bs-target="#kbsCarousel" data-bs-slide="prev">
+   <span class="carousel-control-prev-icon"></span>
+ </button>
+ <button class="carousel-control-next" type="button" data-bs-target="#kbsCarousel" data-bs-slide="next">
+   <span class="carousel-control-next-icon"></span>
+ </button>
+</div>
+
+
+<section class="products-section" id="products">
+ <div class="container">
+   <h2 class="text-center mb-2 section-title">Featured Products</h2>
+   <p class="text-center section-subtitle mb-5">Handpicked picks from the KBS store</p>
+
+
+   <div id="searchStatus" class="search-status">
+     <span id="searchStatusText"></span>
+     <button class="btn-clear" onclick="clearSearch()">
+       <i class="bi bi-x-lg"></i> Clear
+     </button>
+   </div>
+
+
+   <div class="row g-4" id="productGrid">
+     </div>
+ </div>
+</section>
+
+
+<footer class="text-center">
+ <div class="container">
+   <p class="mb-1">&copy; 2026 KBS — Khokhar Bartan Store. All rights reserved.</p>
+ </div>
+</footer>
+
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+ <div class="modal-dialog modal-xl modal-dialog-centered">
+   <div class="modal-content">
+     <div class="modal-header">
+       <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+     </div>
+     <div class="modal-body text-center bg-light">
+       <img id="modalImage" src="" alt="Full size" class="img-fluid shadow-sm rounded" style="max-height: 75vh;">
+       <p id="imageDimensions" class="mt-3 mb-0 fw-bold text-secondary"></p>
+     </div>
+   </div>
+ </div>
+</div>
+
+
+<div id="toast" class="kbs-toast"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="products.js"></script>
+
+<script>
+ // ====== PRODUCT DATA ======
+ 
+
+
+ // ====== CART HELPERS ======
+ const CART_KEY = 'kbs_cart';
+
+
+ function getCart() {
+   try {
+     return JSON.parse(localStorage.getItem(CART_KEY)) || {};
+   } catch (e) {
+     return {};
+   }
+ }
+
+
+ function saveCart(cart) {
+   localStorage.setItem(CART_KEY, JSON.stringify(cart));
+   updateBadge();
+ }
+
+
+ function addToCart(productId) {
+   const cart = getCart();
+   cart[productId] = (cart[productId] || 0) + 1;
+   saveCart(cart);
+   const product = PRODUCTS.find(p => p.id === productId);
+   showToast(product.name + ' added to cart');
+ }
+
+
+ function buyNow(productId) {
+   addToCart(productId);
+   setTimeout(() => { window.location.href = 'cart.html'; }, 400);
+ }
+
+
+ function updateBadge() {
+   const cart = getCart();
+   const total = Object.values(cart).reduce((a, b) => a + b, 0);
+   const badge = document.getElementById('cartBadge');
+   if (badge) badge.textContent = total;
+ }
+
+
+ function showToast(msg) {
+   const t = document.getElementById('toast');
+   t.textContent = msg;
+   t.classList.add('show');
+   clearTimeout(t._timer);
+   t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+ }
+
+
+ // ====== SEARCH ======
+ let currentQuery = '';
+
+
+ function searchProducts(query) {
+   const q = query.trim().toLowerCase();
+   if (q === '') return PRODUCTS;
+   return PRODUCTS.filter(p => {
+     const haystack = (p.name + ' ' + p.desc).toLowerCase();
+     return haystack.includes(q);
+   });
+ }
+
+
+ function highlight(text, query) {
+   if (!query) return escapeHtml(text);
+   const q = query.trim();
+   if (!q) return escapeHtml(text);
+   const safeText = escapeHtml(text);
+   const safeQuery = escapeRegex(escapeHtml(q));
+   const re = new RegExp('(' + safeQuery + ')', 'gi');
+   return safeText.replace(re, '<span class="search-highlight">$1</span>');
+ }
+
+
+ function escapeHtml(str) {
+   return str.replace(/[&<>"']/g, ch => ({
+     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+   }[ch]));
+ }
+ function escapeRegex(str) {
+   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+ }
+
+
+ function handleSearchInput() {
+   currentQuery = document.getElementById('searchInput').value;
+   renderProducts();
+ }
+
+
+ function handleSearchSubmit(event) {
+   event.preventDefault();
+   currentQuery = document.getElementById('searchInput').value;
+   renderProducts();
+   document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+   return false;
+ }
+
+
+ function clearSearch() {
+   document.getElementById('searchInput').value = '';
+   currentQuery = '';
+   renderProducts();
+ }
+
+
+ // ====== RENDER PRODUCT GRID ======
+ function renderProducts() {
+   const grid = document.getElementById('productGrid');
+   const status = document.getElementById('searchStatus');
+   const statusText = document.getElementById('searchStatusText');
+
+
+   const results = searchProducts(currentQuery);
+   const isSearching = currentQuery.trim() !== '';
+
+
+   if (isSearching) {
+     status.classList.add('active');
+     statusText.innerHTML = results.length === 0
+       ? `No products match <strong>"${escapeHtml(currentQuery)}"</strong>`
+       : `Found <strong>${results.length}</strong> result${results.length !== 1 ? 's' : ''} for <strong>"${escapeHtml(currentQuery)}"</strong>`;
+   } else {
+     status.classList.remove('active');
+   }
+
+
+   if (results.length === 0) {
+     grid.innerHTML = `
+       <div class="col-12">
+         <div class="no-results">
+           <i class="bi bi-search"></i>
+           <h5>No matches found</h5>
+           <p>Try a different keyword or browse all products.</p>
+           <button class="btn btn-kbs mt-2" onclick="clearSearch()">Show all products</button>
+         </div>
+       </div>
+     `;
+     return;
+   }
+
+
+   grid.innerHTML = results.map(p => `
+     <div class="col-md-6 col-lg-4">
+       <div class="card product-card shadow-sm">
+         <img src="${p.img}" class="card-img-top" alt="${escapeHtml(p.name)}" style="cursor: zoom-in;" onclick="openImageModal('${p.img}', '${escapeHtml(p.name)}')">
+         <div class="card-body d-flex flex-column">
+           <h5 class="card-title">${highlight(p.name, currentQuery)}</h5>
+           <p class="card-text text-muted">${highlight(p.desc, currentQuery)}</p>
+           <p class="price mb-3">PKR ${p.price.toLocaleString('en-IN')}</p>
+           <div class="mt-auto d-flex gap-2">
+             <button class="btn btn-kbs flex-grow-1" onclick="buyNow('${p.id}')">Buy Now</button>
+             <button class="btn btn-outline-dark" onclick="addToCart('${p.id}')" title="Add to cart">
+               <i class="bi bi-cart-plus"></i>
+             </button>
+           </div>
+         </div>
+       </div>
+     </div>
+   `).join('');
+ }
+
+
+ // ====== IMAGE MODAL LOGIC ======
+ function openImageModal(imgSrc, imgName) {
+   const modalImg = document.getElementById('modalImage');
+   const modalTitle = document.getElementById('imageModalLabel');
+   const dimText = document.getElementById('imageDimensions');
+
+
+   // Reset content
+   modalTitle.textContent = imgName;
+   modalImg.src = imgSrc;
+   dimText.innerHTML = '';
+
+
+   // Calculate natural dimensions once the image is fully loaded into the modal
+  
+
+
+   // Initialize and show the Bootstrap modal
+   const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+   imageModal.show();
+ }
+
+
+ // ====== INIT ======
+ renderProducts();
+ updateBadge();
+
+
+ window.addEventListener('storage', (e) => {
+   if (e.key === CART_KEY) updateBadge();
+ });
+</script>
+
+
+</body>
+</html>
